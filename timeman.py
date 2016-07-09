@@ -81,3 +81,33 @@ class Timer:
             self.timer.start()
             self.timedelta.run()
             self._state = 'running'
+
+    def pause( self ):
+        if self._state == 'new':
+            pass
+        elif self._state == 'running':
+            self.timedelta.pause()
+            self.timer.cancel()  # self.timer will be reconstructed
+                                 # when instance is run again.
+            self._state = 'paused'
+        elif self._state == 'paused':
+            pass
+
+    @property
+    def remains( self ):
+        """Returns remaining time.
+
+        Always return a datetime.timedelta, even if constructed with
+        int or float seconds.
+        """
+        if self._state == 'new':
+            return self.interval  # Original interval.
+        elif self._state == 'running' or self._state == 'paused':
+            value = self.timedelta.value
+            if value >= self.interval:  # Timer is done.
+                self._state = 'done'
+                return datetime.timedelta(0)
+            return self.interval - value
+        elif self._state == 'done':
+            # Timer is done.
+            return datetime.timedelta(0)
