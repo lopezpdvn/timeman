@@ -111,3 +111,24 @@ class Timer:
         elif self._state == 'done':
             # Timer is done.
             return datetime.timedelta(0)
+
+    def cancel( self ):
+        """Cancels Timer.
+
+        Instance cannot be re-run (see pause()).  After cancelled,
+        remaining time will be null timedelta (datetime.timedelta(0)).
+        Use this method only if you are sure this instance will not be
+        needed to run again.  Otherwise use pause().
+        """
+        self.timer.cancel()
+        self.timedelta.pause()
+        self._state = 'done'
+
+    @property
+    def elapsed( self ):
+        """Returns elapsed time.
+
+        If instance was cancelled, the value returned is the whole
+        'interval'.
+        """
+        return self.interval - self.remains
