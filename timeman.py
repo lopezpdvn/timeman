@@ -3,6 +3,55 @@
 import datetime
 from threading import Timer as tTimer
 
+class TimeDelta:
+    """Counts time in process using datetime module.
+
+    This class behaves like an in-process-stopwatch.  It is not
+    intended for applications requiring very accurate results.  Value
+    attribute returns the time as a datetime.timedelta object.  Useless
+    order of method calls are valid, for example calling pause() or
+    reset() just after construction, or calling run() two consecutive
+    times.
+    """
+    # How many times __now() (datetime.datetime.now()) has been called.
+    now_count = 0
+
+    def __init__( self ):
+        """No arguments needed. Note that instances do not run after
+        construction.  Call run() for the first time after
+        construction.
+        """
+        self.__state = 'new'
+        self.__creation_time = self.__now
+        self.__pause_mem = datetime.timedelta(0)
+
+    def __str__( self ):
+        # self.value is a datetime.timedelta object.
+        return str(self.value)
+
+    def __repr__( self ):
+        # self.value is a datetime.timedelta object.
+        """Same as __str__ because instances are expected to be used
+        in an interactive interpreter.
+        """
+        return str(self.value)
+
+    def __now( self ):
+        self.__class__.now_count += 1
+        return datetime.datetime.now()
+    __now = property(__now)
+
+    def run( self ):
+        if self.__state == 'new':
+            # First run() or run() after a paused reset().
+            self.last_run_time = self.__now
+            self.__state = 'running'
+        elif self.__state == 'paused':
+            self.last_run_time = self.__now
+            self.__state = 'running'
+        elif self.__state == 'running':
+            pass
+
 class Timer:
     """Run an action in process after an interval of time.
 
