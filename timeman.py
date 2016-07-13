@@ -52,6 +52,41 @@ class TimeDelta:
         elif self.__state == 'running':
             pass
 
+    def value( self ):
+        """Return current time value.  Call periodically for displays.
+        """
+        if self.__state == 'new':
+            return datetime.timedelta(0)
+        elif self.__state == 'running':
+            # self.__pause_mem contains a value if instance has been
+            # paused before.  Otherwise is datetime.timedelta(0).
+            return self.__now - self.last_run_time + self.__pause_mem
+        elif self.__state == 'paused':
+            return self.__pause_mem
+    value = property(value)
+
+    def pause( self ):
+        if self.__state == 'new':
+            pass
+        elif self.__state == 'running':
+            self.__pause_mem = self.value  # Update pause memory
+            self.__state = 'paused'
+        elif self.__state == 'paused':
+            pass
+
+    def reset( self ):
+        if self.__state == 'new':
+            pass
+        elif self.__state == 'running':
+            # Erase self.__pause_mem and continue running.
+            self.__pause_mem = datetime.timedelta(0)
+            self.last_run_time = self.__now
+        elif self.__state == 'paused':
+            # Behave as 'new' because instance must not automatically
+            # run after reset since it was previously paused.
+            self.__state = 'new'
+            self.__pause_mem = datetime.timedelta(0)
+
 class Timer:
     """Run an action in process after an interval of time.
 
