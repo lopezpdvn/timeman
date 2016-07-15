@@ -3,6 +3,9 @@
 import datetime
 from threading import Timer as tTimer
 
+SECS_PER_DAY = 86400
+MICROSECS_PER_SEC = 1000000
+
 class TimeDelta:
     """Counts time in process using datetime module.
 
@@ -142,6 +145,9 @@ class Timer:
                             self.__callable_obj_kwargs)
 
         self.timedelta = TimeDelta()  # Keep time.
+
+    def __str__( self ):
+        return str(self.remains)
 
     def run(self):
         if self._state == 'new':

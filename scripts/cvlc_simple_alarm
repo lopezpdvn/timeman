@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+'''cvlc_simple_alarm
+
+Run `python -i /path/to/cvlc_simple_alarm`, then start timer in interactive
+interpreter with `t.run()`.
+'''
+
+from subprocess import Popen
+from timeman import Timer
+
+def cvlc_alarm():
+    cmd = ('cvlc', '/path/to/audio/file.ogg')
+    proc = Popen(cmd)
+    return proc.wait()
+
+t = Timer(5, cvlc_alarm)
