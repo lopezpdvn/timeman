@@ -7,12 +7,22 @@ Run `python -i /path/to/cvlc_simple_alarm`, then start timer in interactive
 interpreter with `t.run()`.
 '''
 
-from subprocess import Popen
+from subprocess import Popen, DEVNULL, STDOUT
 from timeman import Timer
 
+alarm_procs = []
+
 def cvlc_alarm():
-    cmd = ('cvlc', '/path/to/audio/file.ogg')
-    proc = Popen(cmd)
-    return proc.wait()
+    cmd = ('cvlc', '--no-metadata-network-access', '--repeat', '/path/to/audio/file.ogg')
+    alarm_procs.append(Popen(cmd, stdout=DEVNULL, stderr=STDOUT))
+    alarm_procs[-1].wait()
+
+def kill_alarms():
+    for proc in alarm_procs:
+        try:
+            proc.kill()
+        except ProcessLookupError:
+            pass
+    alarm_procs.clear()
 
 t = Timer(5, cvlc_alarm)
