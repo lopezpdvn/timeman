@@ -7,13 +7,13 @@ Run `python -i /path/to/cvlc_simple_alarm`, then start timer in interactive
 interpreter with `t.run()`.
 '''
 
+import os
+import sys
 from subprocess import Popen, DEVNULL, STDOUT
 from timeman import Timer
 
-alarm_procs = []
-
 def cvlc_alarm():
-    cmd = ('cvlc', '--no-metadata-network-access', '--repeat', '/path/to/audio/file.ogg')
+    cmd = ('cvlc', '--no-metadata-network-access', '--repeat', alarmfp)
     alarm_procs.append(Popen(cmd, stdout=DEVNULL, stderr=STDOUT))
     alarm_procs[-1].wait()
 
@@ -25,4 +25,29 @@ def kill_alarms():
             pass
     alarm_procs.clear()
 
-t = Timer(5, cvlc_alarm)
+def rebuild_timers():
+    for i in (t, b):
+        i.cancel()
+    build_timers()
+
+def build_timers():
+    global t, b
+    t = Timer(1500, cvlc_alarm)
+    b = Timer(300, cvlc_alarm)
+
+alarmfvar = 'SYSPOL_SOUND_ALARM_INFO_FP'
+
+try:
+    alarmfp = os.environ[alarmfvar]
+    if not os.access(alarmfp, os.R_OK):
+        raise PermissionError
+except KeyError:
+    print('Environment variable `{}` nonexistent'.format(alarmfvar),
+            file=sys.stderr)
+    sys.exit(0)
+except PermissionError:
+    print("Can't read file `{}`".format(alarmfp), file=sys.stderr)
+    sys.exit(0)
+
+alarm_procs = []
+build_timers()
