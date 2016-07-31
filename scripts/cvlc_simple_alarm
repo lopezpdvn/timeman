@@ -44,10 +44,10 @@ try:
 except KeyError:
     print('Environment variable `{}` nonexistent'.format(alarmfvar),
             file=sys.stderr)
-    sys.exit(0)
+    raise
 except PermissionError:
     print("Can't read file `{}`".format(alarmfp), file=sys.stderr)
-    sys.exit(0)
+    raise
 
 alarm_procs = []
 build_timers()
