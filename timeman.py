@@ -222,3 +222,13 @@ class Timer:
         'interval'.
         """
         return self.interval - self.remains
+
+def plot_category_efforts(data, fnames=()):
+    if not len(fnames):
+        return
+    categories = tuple(record[0] for record in data)
+    effort = tuple(record[1] for record in data)
+    plt.pie(effort, labels=categories, shadow=True)
+    plt.axis('equal')
+    for fname in fnames:
+        plt.savefig(fname)
