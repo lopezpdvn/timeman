@@ -3,8 +3,17 @@
 import datetime
 from threading import Timer as tTimer
 
+import matplotlib.pyplot as plt
+import pytaskcoach as tsk
+import pyatt as att
+
+timedelta = datetime.timedelta
+DEFAULT_DATETIME_FMT = tsk.DEFAULT_DATETIME_FMT
+
 SECS_PER_DAY = 86400
 MICROSECS_PER_SEC = 1000000
+
+DEFAULT_TIMEDELTA = timedelta(weeks=1)
 
 class TimeDelta:
     """Counts time in process using datetime module.
@@ -222,6 +231,28 @@ class Timer:
         'interval'.
         """
         return self.interval - self.remains
+
+def validate(taskcoach_cfgdirs, atimetracker_cfgdirs):
+    return (tsk.validate(taskcoach_cfgdirs) and
+            att.validate(atimetracker_cfgdirs))
+
+def get_category_efforts(categories=(), start=None, end=None, tskpaths=(),
+        attpaths=()):
+
+    if start is None:
+        start = datetime.now() - DEFAULT_TIMEDELTA
+
+    efforts = {}
+
+    for ctg, eff in tsk.get_category_efforts(categories, start, end,
+            paths=tskpaths):
+        efforts[ctg] = efforts.get(ctg, timedelta()) + eff
+
+    for ctg, eff in att.get_category_efforts(categories, start, end, attpaths):
+        efforts[ctg] = efforts.get(ctg, timedelta()) + eff
+
+    for ctg, eff in efforts.items():
+        yield (ctg, eff.total_seconds())
 
 def plot_category_efforts(data, fnames=()):
     if not len(fnames):
