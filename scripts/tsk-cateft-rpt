@@ -68,7 +68,8 @@ if total_effort:
     out = [(category, effort, effort / total_effort)
             for category, effort in out]
 else:
-    out = [(category, effort, None)
+    default_ratio = float()
+    out = [(category, effort, default_ratio)
             for category, effort in out]
 
 out.sort(key=lambda record: record[1], reverse=args.reverse)
