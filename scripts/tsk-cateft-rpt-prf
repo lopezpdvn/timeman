@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+'''tsk-cateft-rpt-prf
+'''
+
+import sys
+import json
+from os import environ
+from os.path import join, pathsep
+from subprocess import Popen, PIPE
+from itertools import chain
+from datetime import timedelta
+
+profile_name = sys.argv[1]
+config_dir = environ['TIMEMAN']
+profile_path = join(config_dir, profile_name + '.json')
+tskcatefft = 'tsk-cateft-rpt'
+
+with open(profile_path) as f:
+    prf = json.load(f)
+
+for rpt in prf['reports']:
+    rpt_id = '_'.join((rpt['category_set'], rpt['interval']))
+    out_dir = rpt.get('out_dir', prf['default_out_dir'])
+    out_fps = [join(x, rpt_id + '.txt') for x in out_dir]
+    categories = prf['category_sets'][rpt['category_set']]
+    effort_start = prf['intervals'][rpt['interval']][0]
+    effort_end = prf['intervals'][rpt['interval']][1]
+    try:
+        if isinstance(rpt['plot_dir'], bool):
+            img_out = (prf['default_plot_dir'] if rpt['plot_dir']
+                    else rpt['plot_dir'])
+        else:
+            img_out = rpt['plot_dir']
+        img_out = [join(x, rpt_id + '.png') for x in img_out]
+    except KeyError:
+        img_out = []
+    taskcoach_cfg_dirs = prf['taskcoach_cfg_dirs']
+    atimetracker_cfg_dirs = prf['atimetracker_cfg_dirs']
+    try:
+        len(rpt['fmt_widths'])
+        fmt_widths = rpt['fmt_widths']
+    except (TypeError, KeyError):
+        fmt_widths = prf['default_fmt_widths']
+
+    cmd = list(chain([tskcatefft, '--start', effort_start],
+        categories, ['--taskcoach-config-dirs'], taskcoach_cfg_dirs,
+        ['--atimetracker-config-dirs'], atimetracker_cfg_dirs,
+        ['--validate']))
+    if effort_end:
+        cmd.extend(('--end', effort_end))
+    if img_out:
+        cmd.extend(('--img-out', *img_out))
+    print(cmd)
+
+    with Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True) as proc:
+        stderr = proc.stderr.read()
+        out = [l.split('\t') for l in proc.stdout.read().splitlines()]
+    out = [(cat, timedelta(seconds=float(eft)), '{:.2%}'.format(float(ratio)))
+            for cat, eft, ratio in out]
+
+    for fp in out_fps:
+        with open(fp, 'w') as f:
+            for cat, eft, ratio in out:
+                print('{!s:>{width}}  '.format(ratio, width=fmt_widths[0]),
+                        end='', file=f)
+                print('{!s:<{width}}'.format(cat, width=fmt_widths[1]), end='',
+                        file=f)
+                print(eft, end='', file=f)
+                print(file=f)
+            print(file=f)
+            print(stderr, file=f)
+
+sys.exit(proc.returncode)
+
+# vim: ft=python
