@@ -47,12 +47,7 @@ except (KeyError, ValueError):
     END = datetime.now()
 stderro_vals.append(END)
 
-try:
-    IMG_PLOT_FP = (args.img_out if args.img_out else
-        environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_IMG_PLOT_FP']\
-        .split(pathsep))
-except ValueError:
-    IMG_PLOT_FP = ()
+IMG_PLOT_FP = args.img_out if args.img_out else ()
 
 # config done
 

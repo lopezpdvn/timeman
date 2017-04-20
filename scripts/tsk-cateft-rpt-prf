@@ -16,6 +16,7 @@ profile_name = sys.argv[1]
 config_dir = environ['TIMEMAN']
 profile_path = join(config_dir, profile_name + '.json')
 tskcatefft = 'tsk-cateft-rpt'
+environ['MPLBACKEND'] = 'AGG'
 
 with open(profile_path) as f:
     prf = json.load(f)
