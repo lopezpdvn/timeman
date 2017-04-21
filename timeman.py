@@ -3,7 +3,6 @@
 import datetime
 from threading import Timer as tTimer
 
-import matplotlib.pyplot as plt
 import pytaskcoach as tsk
 import pyatt as att
 
@@ -257,6 +256,7 @@ def get_category_efforts(categories=(), start=None, end=None, tskpaths=(),
 def plot_category_efforts(data, fnames=()):
     if not len(fnames):
         return
+    import matplotlib.pyplot as plt
     categories = tuple(record[0] for record in data)
     effort = tuple(record[1] for record in data)
     plt.pie(effort, labels=categories, shadow=True)
