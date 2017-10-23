@@ -12,38 +12,68 @@ from subprocess import Popen, PIPE
 from itertools import chain
 from datetime import timedelta
 
+DEFAULT_PROFILE_NAME = 'default'
+PROFILE_EXT = 'json'
+DEFAULT_PROFILE_FNAME = '.'.join((DEFAULT_PROFILE_NAME, PROFILE_EXT))
+
 profile_name = sys.argv[1]
 config_dir = environ['TIMEMAN']
 profile_path = join(config_dir, profile_name + '.json')
+DEFAULT_PROFILE_PATH = join(config_dir, DEFAULT_PROFILE_FNAME)
 tskcatefft = 'tsk-cateft-rpt'
 environ['MPLBACKEND'] = 'AGG'
 
 with open(profile_path) as f:
     prf = json.load(f)
 
+with open(DEFAULT_PROFILE_PATH) as f:
+    prf_default = json.load(f)
+
 for rpt in prf['reports']:
     rpt_id = '_'.join((rpt['category_set'], rpt['interval']))
-    out_dir = rpt.get('out_dir', prf['default_out_dir'])
+    try:
+        out_dir = rpt.get('out_dir', prf['default_out_dir'])
+        if not out_dir:
+            raise KeyError();
+    except KeyError:
+        out_dir = prf_default['default_out_dir']
     out_fps = [join(x, rpt_id + '.txt') for x in out_dir]
-    categories = prf['category_sets'][rpt['category_set']]
-    effort_start = prf['intervals'][rpt['interval']][0]
-    effort_end = prf['intervals'][rpt['interval']][1]
+
+    try:
+        categories = prf['category_sets'][rpt['category_set']]
+    except KeyError:
+        categories = prf_default['category_sets'][rpt['category_set']]
+    try:
+        interval = prf['intervals'][rpt['interval']]
+    except:
+        interval = prf_default['intervals'][rpt['interval']]
+
+    effort_start = interval[0]
+    effort_end = interval[1]
     try:
         if isinstance(rpt['plot_dir'], bool):
-            img_out = (prf['default_plot_dir'] if rpt['plot_dir']
-                    else rpt['plot_dir'])
+            if rpt['plot_dir']:
+                img_out = prf.get('default_plot_dir',
+                        prf_default['default_plot_dir'])
+            else:
+                img_out = rpt['plot_dir']
         else:
             img_out = rpt['plot_dir']
+        if not img_out:
+            raise KeyError()
         img_out = [join(x, rpt_id + '.png') for x in img_out]
     except KeyError:
         img_out = []
-    taskcoach_cfg_dirs = prf['taskcoach_cfg_dirs']
-    atimetracker_cfg_dirs = prf['atimetracker_cfg_dirs']
+    taskcoach_cfg_dirs = prf.get('taskcoach_cfg_dirs',
+            prf_default['taskcoach_cfg_dirs'])
+    atimetracker_cfg_dirs = prf.get('atimetracker_cfg_dirs',
+            prf_default['atimetracker_cfg_dirs'])
     try:
         len(rpt['fmt_widths'])
         fmt_widths = rpt['fmt_widths']
     except (TypeError, KeyError):
-        fmt_widths = prf['default_fmt_widths']
+        fmt_widths = prf.get('default_fmt_widths',
+                prf_default['default_fmt_widths'])
 
     cmd = list(chain([tskcatefft, '--start', effort_start],
         categories, ['--taskcoach-config-dirs'], taskcoach_cfg_dirs,
@@ -53,7 +83,7 @@ for rpt in prf['reports']:
         cmd.extend(('--end', effort_end))
     if img_out:
         cmd.extend(('--img-out', *img_out))
-    print(cmd)
+    print(' '.join(cmd))
 
     with Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True) as proc:
         stderr = proc.stderr.read()
