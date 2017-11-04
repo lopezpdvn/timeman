@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+'''tsk-cateft-dump-prf
+'''
+
+import sys
+import json
+from os import environ
+from os.path import join, pathsep
+from subprocess import Popen, PIPE
+from itertools import chain
+from datetime import timedelta
+
+DEFAULT_PROFILE_NAME = 'default'
+PROFILE_EXT = 'json'
+DEFAULT_PROFILE_FNAME = '.'.join((DEFAULT_PROFILE_NAME, PROFILE_EXT))
+
+profile_name = sys.argv[1]
+config_dir = environ['TIMEMAN']
+profile_path = join(config_dir, profile_name + '.json')
+DEFAULT_PROFILE_PATH = join(config_dir, DEFAULT_PROFILE_FNAME)
+tskcatefft = 'tsk-cateft-rpt'
+environ['MPLBACKEND'] = 'AGG'
+
+with open(profile_path) as f:
+    prf = json.load(f)
+
+with open(DEFAULT_PROFILE_PATH) as f:
+    prf_default = json.load(f)
+
+for rpt in prf['reports']:
+    rpt_id = '_'.join((rpt['category_set'], rpt['interval']))
+    try:
+        out_dir = rpt.get('out_dir', prf['default_out_dir'])
+        if not out_dir:
+            raise KeyError();
+    except KeyError:
+        out_dir = prf_default['default_out_dir']
+    out_fps = [join(x, rpt_id + '.txt') for x in out_dir]
+
+    try:
+        categories = prf['category_sets'][rpt['category_set']]
+    except KeyError:
+        categories = prf_default['category_sets'][rpt['category_set']]
+    try:
+        interval = prf['intervals'][rpt['interval']]
+    except:
+        interval = prf_default['intervals'][rpt['interval']]
+
+    effort_start = interval[0]
+    effort_end = interval[1]
+    try:
+        if isinstance(rpt['plot_dir'], bool):
+            if rpt['plot_dir']:
+                img_out = prf.get('default_plot_dir',
+                        prf_default['default_plot_dir'])
+            else:
+                img_out = rpt['plot_dir']
+        else:
+            img_out = rpt['plot_dir']
+        if not img_out:
+            raise KeyError()
+        img_out = [join(x, rpt_id + '.png') for x in img_out]
+    except KeyError:
+        img_out = []
+    taskcoach_cfg_dirs = prf.get('taskcoach_cfg_dirs',
+            prf_default['taskcoach_cfg_dirs'])
+    atimetracker_cfg_dirs = prf.get('atimetracker_cfg_dirs',
+            prf_default['atimetracker_cfg_dirs'])
+    try:
+        len(rpt['fmt_widths'])
+        fmt_widths = rpt['fmt_widths']
+    except (TypeError, KeyError):
+        fmt_widths = prf.get('default_fmt_widths',
+                prf_default['default_fmt_widths'])
+
+    try:
+        dump_fp = rpt['dump_fp']
+    except KeyError:
+        try:
+            dump_fp = prf['default_dump_fp']
+        except KeyError:
+            dump_fp = prf_default['default_dump_fp']
+
+    cmd = list(chain([tskcatefft, '--start', effort_start],
+        categories, ['--taskcoach-config-dirs'], taskcoach_cfg_dirs,
+        ['--atimetracker-config-dirs'], atimetracker_cfg_dirs,
+        ['--dump-path', dump_fp]))
+    if effort_end:
+        cmd.extend(('--end', effort_end))
+
+    print(' '.join(cmd))
+    with Popen(cmd, stdout=sys.stdout, stderr=sys.stderr,
+            universal_newlines=True) as proc:
+        proc.wait()
+
+sys.exit(proc.returncode)
+
+# vim: ft=python
