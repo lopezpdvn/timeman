@@ -5,13 +5,14 @@
 '''
 
 import sys
+import json
 from os import environ
 from os.path import pathsep
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
 from timeman import (validate, get_category_efforts, plot_category_efforts,
-        DEFAULT_DATETIME_FMT)
+        DEFAULT_DATETIME_FMT, get_category_efforts_details)
 
 stderro_fmt = '{}: {}'
 stderro_names = ('start', 'end', 'total_effort_time', 'total_time',
@@ -28,6 +29,7 @@ parser.add_argument('-a', '--atimetracker-config-dirs', nargs='*',
 parser.add_argument('-p', '--img-out', nargs='*')
 parser.add_argument('-r', '--reverse', action='store_true')
 parser.add_argument('-V', '--validate', action='store_true')
+parser.add_argument('-d', '--dump-path')
 args = parser.parse_args()
 
 TASKCOACH_FP = (args.taskcoach_config_dirs if args.taskcoach_config_dirs
@@ -51,8 +53,22 @@ IMG_PLOT_FP = args.img_out if args.img_out else ()
 
 # config done
 
+def dump():
+    efforts = get_category_efforts_details(CATEGORIES, START, END, TASKCOACH_FP,
+            args.atimetracker_config_dirs)
+    efforts.sort(key=lambda eft: eft['start'])
+    for eft in efforts:
+        eft['start'] = str(eft['start'])
+        eft['end'] = str(eft['end'])
+    with open(args.dump_path, 'w') as f:
+        json.dump(efforts, f, sort_keys=True, indent=2)
+
 if args.validate:
     assert validate(TASKCOACH_FP, args.atimetracker_config_dirs)
+
+if args.dump_path:
+    dump()
+    sys.exit(0)
 
 out = tuple((category, effort) for category, effort in
         get_category_efforts(CATEGORIES, START, END, TASKCOACH_FP,
