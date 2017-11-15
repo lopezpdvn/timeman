@@ -235,6 +235,11 @@ def validate(taskcoach_cfgdirs, atimetracker_cfgdirs):
     return (tsk.validate(taskcoach_cfgdirs) and
             att.validate(atimetracker_cfgdirs))
 
+def get_category_efforts_totals(categories=(), start=None, end=None, tskpaths=(),
+        attpaths=()):
+    for i in get_category_efforts(categories, start, end, tskpaths, attpaths):
+        yield i;
+
 def get_category_efforts(categories=(), start=None, end=None, tskpaths=(),
         attpaths=()):
 
@@ -252,6 +257,19 @@ def get_category_efforts(categories=(), start=None, end=None, tskpaths=(),
 
     for ctg, eff in efforts.items():
         yield (ctg, eff.total_seconds())
+
+def get_category_efforts_details(categories=(), start=None, end=None,
+        tskpaths=(), attpaths=()):
+    if start is None:
+        start = datetime.now() - DEFAULT_TIMEDELTA
+
+    efforts = [effort for effort in tsk.get_category_efforts_details(
+                                        categories, start, end, paths=tskpaths)]
+
+    efforts.extend(effort for effort in att.get_category_efforts_details(
+                                              categories, start, end, attpaths))
+
+    return efforts
 
 def plot_category_efforts(data, fnames=()):
     if not len(fnames):
