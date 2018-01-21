@@ -12,6 +12,8 @@ DEFAULT_DATETIME_FMT = tsk.DEFAULT_DATETIME_FMT
 SECS_PER_DAY = 86400
 MICROSECS_PER_SEC = 1000000
 
+EFFORT_KEYS_SORTED = ('category', 'start', 'end', 'effort', 'task')
+
 DEFAULT_TIMEDELTA = timedelta(weeks=1)
 
 class TimeDelta:
