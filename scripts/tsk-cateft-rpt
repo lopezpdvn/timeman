@@ -21,7 +21,8 @@ stderro_names = ('start', 'end', 'total_effort_time', 'total_time',
 stderro_vals = []
 
 parser = ArgumentParser()
-parser.add_argument('category_subjects', nargs='*')
+parser.add_argument('category_subjects', nargs='*',
+        help='''For every category x, this selects all tasks of category x including those of any subcategory of x. This does not select tasks of a bare category x excluding those of subcategories of x. For example, selecting `health`, `health/meta`, `health/misc` will contain redundant data because `health` matches _any_ tasks of category `health` _including_ those of (sub)category `health/misc` and `health/meta`.''')
 parser.add_argument('-s', '--start')
 parser.add_argument('-e', '--end')
 parser.add_argument('-t', '--taskcoach-config-dirs', nargs='*', required=True)
