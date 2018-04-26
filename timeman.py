@@ -1,6 +1,8 @@
 """Tools for management of time and tasks."""
 
+import sys
 import datetime
+from calendar import isleap
 from threading import Timer as tTimer
 
 import pytaskcoach as tsk
@@ -283,3 +285,14 @@ def plot_category_efforts(data, fnames=()):
     plt.axis('equal')
     for fname in fnames:
         plt.savefig(fname)
+
+def get_year_progress():
+    now = datetime.datetime.now()
+    year_delta_days = 366 if isleap(now.year) else 365
+    year_delta = datetime.timedelta(days=year_delta_days)
+    year_start = datetime.datetime(now.year, 1, 1)
+    year_progress_delta = now - year_start
+    return year_progress_delta / year_delta
+
+def print_year_progress(fout=sys.stdout):
+    print('{:.2%}'.format(get_year_progress()), file=fout)
