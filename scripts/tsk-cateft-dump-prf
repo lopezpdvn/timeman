@@ -95,6 +95,7 @@ for rpt in prf['reports']:
             universal_newlines=True) as proc:
         proc.wait()
 
-sys.exit(proc.returncode)
+if proc:
+    sys.exit(proc.returncode)
 
 # vim: ft=python
