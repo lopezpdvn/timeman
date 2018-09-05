@@ -29,6 +29,8 @@ with open(profile_path) as f:
 with open(DEFAULT_PROFILE_PATH) as f:
     prf_default = json.load(f)
 
+exit_code = 0
+
 for rpt in prf['reports']:
     rpt_id = '_'.join((rpt['category_set'], rpt['interval']))
     try:
@@ -95,7 +97,8 @@ for rpt in prf['reports']:
             universal_newlines=True) as proc:
         proc.wait()
 
-if proc:
-    sys.exit(proc.returncode)
+    exit_code = proc.returncode
+
+sys.exit(exit_code)
 
 # vim: ft=python
