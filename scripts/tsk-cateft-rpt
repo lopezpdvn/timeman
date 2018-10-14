@@ -15,6 +15,15 @@ from collections import OrderedDict
 from timeman import (validate, get_category_efforts, plot_category_efforts,
         DEFAULT_DATETIME_FMT, get_category_efforts_details, EFFORT_KEYS_SORTED)
 
+def to_str_display(x):
+    timedelta_methodname_check = 'total_seconds'
+
+    # small duck typing test, is x a timedelta?
+    if hasattr(x, timedelta_methodname_check):
+        return str(x)
+    else:
+        return str(x)
+
 stderro_fmt = '{}: {}'
 stderro_names = ('start', 'end', 'total_effort_time', 'total_time',
         'effort_fraction')
@@ -100,7 +109,7 @@ stderro_vals.append(timedelta(seconds=total_time))
 stderro_vals.append(total_effort / total_time)
 
 for record in out:
-    print('\t'.join(str(i) for i in record))
+    print('\t'.join(to_str_display(i) for i in record))
 
 print(file=sys.stderr)
 for i, stderro_val in enumerate(stderro_vals):
