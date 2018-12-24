@@ -286,15 +286,17 @@ def plot_category_efforts(data, fnames=()):
     for fname in fnames:
         plt.savefig(fname)
 
-def get_year_progress(offset=datetime.timedelta()):
+def get_year_progress(offset=datetime.timedelta(), year_start=None):
     now = datetime.datetime.now()
     year_delta_days = 366 if isleap(now.year) else 365
     year_delta = datetime.timedelta(days=year_delta_days)
-    year_start = datetime.datetime(now.year, 1, 1)
-    year_progress_delta = now - year_start + offset
+    _year_start = (year_start if year_start
+            else datetime.datetime(now.year, 1, 1))
+    year_progress_delta = now - _year_start + offset
     return year_progress_delta / year_delta
 
 def print_year_progress(fout=sys.stdout):
-    offset = datetime.timedelta(days=10)
-    print('{:.2%}'.format(get_year_progress(offset)), file=fout)
+    now = datetime.datetime.now()
+    x_start = datetime.datetime(2018, 12, 22)
+    print('{:.2%}'.format(get_year_progress(year_start=x_start)), file=fout)
     print('{:.2%}'.format(get_year_progress()), file=fout)
