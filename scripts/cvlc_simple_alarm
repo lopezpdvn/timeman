@@ -35,7 +35,7 @@ def build_timers():
     global t, b
     kill_alarms()
     t = Timer(1500, cvlc_alarm)
-    b = Timer(200, cvlc_alarm)
+    b = Timer(300, cvlc_alarm)
 
 alarmfvar = 'SYSPOL_SOUND_ALARM_INFO_FP'
 
