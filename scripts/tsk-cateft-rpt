@@ -13,16 +13,8 @@ from argparse import ArgumentParser
 from collections import OrderedDict
 
 from timeman import (validate, get_category_efforts, plot_category_efforts,
-        DEFAULT_DATETIME_FMT, get_category_efforts_details, EFFORT_KEYS_SORTED)
-
-def to_str_display(x):
-    timedelta_methodname_check = 'total_seconds'
-
-    # small duck typing test, is x a timedelta?
-    if hasattr(x, timedelta_methodname_check):
-        return str(x)
-    else:
-        return str(x)
+        DEFAULT_DATETIME_FMT, get_category_efforts_details, EFFORT_KEYS_SORTED,
+        to_str_display)
 
 stderro_fmt = '{}: {}'
 stderro_names = ('start', 'end', 'total_effort_time', 'total_time',
@@ -113,7 +105,8 @@ for record in out:
 
 print(file=sys.stderr)
 for i, stderro_val in enumerate(stderro_vals):
-    print(stderro_fmt.format(stderro_names[i], stderro_val), file=sys.stderr)
+    print(stderro_fmt.format(stderro_names[i], to_str_display(stderro_val)),
+            file=sys.stderr)
 
 plot_category_efforts(out, IMG_PLOT_FP)
 

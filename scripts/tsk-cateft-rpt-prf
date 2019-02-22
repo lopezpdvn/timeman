@@ -12,6 +12,8 @@ from subprocess import Popen, PIPE
 from itertools import chain
 from datetime import timedelta
 
+from timeman import to_str_display
+
 DEFAULT_PROFILE_NAME = 'default'
 PROFILE_EXT = 'json'
 DEFAULT_PROFILE_FNAME = '.'.join((DEFAULT_PROFILE_NAME, PROFILE_EXT))
@@ -88,7 +90,8 @@ for rpt in prf['reports']:
     with Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True) as proc:
         stderr = proc.stderr.read()
         out = [l.split('\t') for l in proc.stdout.read().splitlines()]
-    out = [(cat, timedelta(seconds=float(eft)), '{:.2%}'.format(float(ratio)))
+    out = [(cat, to_str_display(timedelta(seconds=float(eft))),
+                 '{:.2%}'.format(float(ratio)))
             for cat, eft, ratio in out]
 
     for fp in out_fps:

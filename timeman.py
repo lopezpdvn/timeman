@@ -12,6 +12,7 @@ timedelta = datetime.timedelta
 DEFAULT_DATETIME_FMT = tsk.DEFAULT_DATETIME_FMT
 
 SECS_PER_DAY = 86400
+SECS_PER_HOUR = 3600
 MICROSECS_PER_SEC = 1000000
 
 EFFORT_KEYS_SORTED = ('category', 'start', 'end', 'effort', 'task')
@@ -300,3 +301,12 @@ def print_year_progress(fout=sys.stdout):
     x_start = datetime.datetime(2018, 12, 22)
     print('{:.2%}'.format(get_year_progress(year_start=x_start)), file=fout)
     print('{:.2%}'.format(get_year_progress()), file=fout)
+
+def to_str_display(x):
+    timedelta_methodname_check = 'total_seconds'
+
+    # small duck typing test, is x a timedelta?
+    if hasattr(x, timedelta_methodname_check):
+        return '{0:,.2f}'.format(x.total_seconds() / SECS_PER_HOUR)
+    else:
+        return str(x)
