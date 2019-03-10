@@ -310,3 +310,7 @@ def to_str_display(x):
         return '{0:,.2f}'.format(x.total_seconds() / SECS_PER_HOUR)
     else:
         return str(x)
+
+def get_categories(tskpaths, attpaths):
+    yield 'aaa'
+    yield 'bbb'
