@@ -25,6 +25,6 @@ atimetracker_cfg_dirs = prf_default['atimetracker_cfg_dirs']
 categories = list(sorted(set(
     get_categories(taskcoach_cfg_dirs, atimetracker_cfg_dirs))))
 
-print(*categories, sep=linesep)
+print(*categories, sep='\n')
 
 # vim: ft=python

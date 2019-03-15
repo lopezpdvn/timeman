@@ -312,5 +312,5 @@ def to_str_display(x):
         return str(x)
 
 def get_categories(tskpaths, attpaths):
-    yield 'aaa'
-    yield 'bbb'
+    yield from tsk.get_categories(tskpaths)
+    yield from att.get_categories(tskpaths)
