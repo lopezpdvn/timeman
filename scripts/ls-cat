@@ -8,19 +8,16 @@ from os import environ, linesep
 from os.path import join
 
 from timeman import get_categories
+from timeman.constants import *
 
-DEFAULT_PROFILE_NAME = 'default'
-PROFILE_EXT = 'json'
-DEFAULT_PROFILE_FNAME = '.'.join((DEFAULT_PROFILE_NAME, PROFILE_EXT))
-
-config_dir = environ['TIMEMAN']
+config_dir = environ[DEFAULT_CONFIG_DIR_ENVIRONMENT_VARIABLE_NAME]
 DEFAULT_PROFILE_PATH = join(config_dir, DEFAULT_PROFILE_FNAME)
 
 with open(DEFAULT_PROFILE_PATH) as f:
     prf_default = json.load(f)
 
-taskcoach_cfg_dirs = prf_default['taskcoach_cfg_dirs']
-atimetracker_cfg_dirs = prf_default['atimetracker_cfg_dirs']
+taskcoach_cfg_dirs = prf_default[PROFILE_TASKCOACH_CONFIG_DIRS_KEY]
+atimetracker_cfg_dirs = prf_default[PROFILE_ATIMETRACKER_CONFIG_DIRS_KEY]
 
 categories = list(sorted(set(
     get_categories(taskcoach_cfg_dirs, atimetracker_cfg_dirs))))
