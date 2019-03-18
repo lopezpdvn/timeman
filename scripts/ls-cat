@@ -8,14 +8,10 @@ from os import environ, linesep
 from os.path import join
 
 from timeman import get_categories
+from timeman.config import get_default_profile
 from timeman.constants import *
 
-config_dir = environ[DEFAULT_CONFIG_DIR_ENVIRONMENT_VARIABLE_NAME]
-DEFAULT_PROFILE_PATH = join(config_dir, DEFAULT_PROFILE_FNAME)
-
-with open(DEFAULT_PROFILE_PATH) as f:
-    prf_default = json.load(f)
-
+prf_default = get_default_profile()
 taskcoach_cfg_dirs = prf_default[PROFILE_TASKCOACH_CONFIG_DIRS_KEY]
 atimetracker_cfg_dirs = prf_default[PROFILE_ATIMETRACKER_CONFIG_DIRS_KEY]
 
