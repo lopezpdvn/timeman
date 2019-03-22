@@ -3,10 +3,6 @@
 
 '''ls-cat'''
 
-import json
-from os import environ, linesep
-from os.path import join
-
 from timeman import get_categories
 from timeman.config import get_default_profile
 from timeman.constants import *
@@ -15,8 +11,8 @@ prf_default = get_default_profile()
 taskcoach_cfg_dirs = prf_default[PROFILE_TASKCOACH_CONFIG_DIRS_KEY]
 atimetracker_cfg_dirs = prf_default[PROFILE_ATIMETRACKER_CONFIG_DIRS_KEY]
 
-categories = list(sorted(set(
-    get_categories(taskcoach_cfg_dirs, atimetracker_cfg_dirs))))
+categories = sorted(set(
+    get_categories(taskcoach_cfg_dirs, atimetracker_cfg_dirs)))
 
 print(*categories, sep='\n')
 
