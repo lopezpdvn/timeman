@@ -313,4 +313,4 @@ def to_str_display(x):
 
 def get_categories(tskpaths, attpaths):
     yield from tsk.get_categories(tskpaths)
-    yield from att.get_categories(tskpaths)
+    yield from att.get_categories(attpaths)
