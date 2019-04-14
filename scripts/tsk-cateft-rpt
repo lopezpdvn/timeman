@@ -16,6 +16,24 @@ from timeman import (validate, get_category_efforts, plot_category_efforts,
         DEFAULT_DATETIME_FMT, get_category_efforts_details, EFFORT_KEYS_SORTED,
         to_str_display)
 
+
+CATEGORY_SUBJECTS_HELP_MSG = '''
+For every category x, this selects all tasks of category x including those of
+any subcategory of x. This does not select tasks of a bare category x excluding
+those of subcategories of x.
+
+For example, selecting `health`, `health/meta`, `health/misc` will contain
+redundant data because `health` matches _any_ tasks of category `health`
+_including_ those of (sub)category `health/misc` and `health/meta`.
+
+The presence or absence category separator character `/` is relevant for the
+category selection. For example: `meta` will only match the top level category
+`meta` and its children; it will not match a subcategory named the same, like
+`health/meta`. Similarly, `meta/` is not the same as `meta`; the former is the
+empty subcategory of parent category `meta`, while the latter is the parent
+`meta` and all of its subcategories/children.
+'''
+
 stderro_fmt = '{}: {}'
 stderro_names = ('start', 'end', 'total_effort_time', 'total_time',
         'effort_fraction')
@@ -23,7 +41,7 @@ stderro_vals = []
 
 parser = ArgumentParser()
 parser.add_argument('category_subjects', nargs='*',
-        help='''For every category x, this selects all tasks of category x including those of any subcategory of x. This does not select tasks of a bare category x excluding those of subcategories of x. For example, selecting `health`, `health/meta`, `health/misc` will contain redundant data because `health` matches _any_ tasks of category `health` _including_ those of (sub)category `health/misc` and `health/meta`.''')
+        help=CATEGORY_SUBJECTS_HELP_MSG)
 parser.add_argument('-s', '--start')
 parser.add_argument('-e', '--end')
 parser.add_argument('-t', '--taskcoach-config-dirs', nargs='*', required=True)
