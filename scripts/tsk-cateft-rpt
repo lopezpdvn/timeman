@@ -28,7 +28,7 @@ _including_ those of (sub)category `health/misc` and `health/meta`.
 
 The presence or absence category separator character `/` is relevant for the
 category selection. For example: `meta` will only match the top level category
-`meta` and its children; it will not match a subcategory named the same, like
+`meta` and its children; it will not match a subcategory named the same like
 `health/meta`. Similarly, `meta/` is not the same as `meta`; the former is the
 empty subcategory of parent category `meta`, while the latter is the parent
 `meta` and all of its subcategories/children.
