@@ -21,6 +21,10 @@ DEFAULT_PROFILE_FNAME = '.'.join((DEFAULT_PROFILE_NAME, PROFILE_EXT))
 
 parser = ArgumentParser()
 parser.add_argument('profile_name', help='timeman profile name')
+parser.add_argument('-c', '--ls-all-category-sets', action='store_true',
+    help='''
+    List all category sets of the profile, instead of running the
+    effort report.''')
 args = parser.parse_args()
 profile_name = args.profile_name
 
@@ -36,6 +40,8 @@ with open(profile_path) as f:
 with open(DEFAULT_PROFILE_PATH) as f:
     prf_default = json.load(f)
 
+exit_code = -1
+
 for rpt in prf['reports']:
     rpt_id = '_'.join((rpt['category_set'], rpt['interval']))
     try:
@@ -50,6 +56,13 @@ for rpt in prf['reports']:
         categories = prf['category_sets'][rpt['category_set']]
     except KeyError:
         categories = prf_default['category_sets'][rpt['category_set']]
+
+    if args.ls_all_category_sets:
+        print(rpt['category_set'], end='\t')
+        print('\t'.join(categories))
+        exit_code = 0
+        continue
+
     try:
         interval = prf['intervals'][rpt['interval']]
     except:
@@ -111,6 +124,8 @@ for rpt in prf['reports']:
             print(file=f)
             print(stderr, file=f)
 
-sys.exit(proc.returncode)
+    exit_code = proc.returncode
+
+sys.exit(exit_code)
 
 # vim: ft=python
