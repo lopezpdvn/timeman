@@ -11,6 +11,7 @@ from os.path import join, pathsep
 from subprocess import Popen, PIPE
 from itertools import chain
 from datetime import timedelta
+from argparse import ArgumentParser
 
 from timeman import to_str_display
 
@@ -18,7 +19,11 @@ DEFAULT_PROFILE_NAME = 'default'
 PROFILE_EXT = 'json'
 DEFAULT_PROFILE_FNAME = '.'.join((DEFAULT_PROFILE_NAME, PROFILE_EXT))
 
-profile_name = sys.argv[1]
+parser = ArgumentParser()
+parser.add_argument('profile_name', help='timeman profile name')
+args = parser.parse_args()
+profile_name = args.profile_name
+
 config_dir = environ['TIMEMAN']
 profile_path = join(config_dir, profile_name + '.json')
 DEFAULT_PROFILE_PATH = join(config_dir, DEFAULT_PROFILE_FNAME)
