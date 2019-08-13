@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+'''validate
+'''
+
+import json
+import sys
+from glob import iglob
+
+for prf in sorted(iglob('*json')):
+    with open(prf) as f:
+        try:
+            json.load(f)
+        except json.JSONDecodeError as e:
+            print(prf, sys.stderr)
+            raise e
+
+# vim: ft=python
