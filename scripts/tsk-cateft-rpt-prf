@@ -25,6 +25,8 @@ parser.add_argument('-c', '--ls-all-category-sets', action='store_true',
     help='''
     List all category sets of the profile, instead of running the
     effort report.''')
+parser.add_argument('-v', '--verbose', action='store_true',
+    help='Be verbose. Duh')
 args = parser.parse_args()
 profile_name = args.profile_name
 
@@ -103,7 +105,8 @@ for rpt in prf['reports']:
         cmd.extend(('--end', effort_end))
     if img_out:
         cmd.extend(('--img-out', *img_out))
-    print(' '.join(cmd))
+    if args.verbose:
+        print(' '.join(cmd))
 
     with Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True) as proc:
         stderr = proc.stderr.read()
